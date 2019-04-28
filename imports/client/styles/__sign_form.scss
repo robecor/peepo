@@ -20,7 +20,7 @@
       border-color: transparent;
       border-radius: 5px;
       text-align: center;
-      width: 100px;
+      width: 50px;
     }
 
     button {
@@ -31,6 +31,10 @@
       border-radius: 5px;
       cursor: pointer;
       margin-top: 30px;
+
+      :disabled {
+        background-color: $dark-night-blue;
+      }
     }
 
     .sign-form-header {

@@ -1,12 +1,28 @@
 import React, {Component} from 'react';
 import {Form, Field} from 'react-final-form';
+import {Accounts} from 'meteor/accounts-base';
 
 export default class Login extends Component {
-  onSubmit = (data) => {
-    console.log(data);
+  state = {
+    isLoading: false
+  };
+
+  onSubmit = ({username, password}) => {
+    this.setState({isLoading: true});
+
+    Meteor.loginWithPassword(username, password, (err) => {
+      this.setState({isLoading: true});
+      if (err) {
+        console.log(err);
+      } else {
+        alert('Login success');
+      }
+    })
   };
 
   render() {
+    const {isLoading} = this.state;
+
     return (
       <Form
         onSubmit={this.onSubmit}
@@ -17,10 +33,10 @@ export default class Login extends Component {
                 <h1>Login</h1>
               </div>
 
-              <Field name="userName" component="input" placeholder="Username"/>
+              <Field name="username" component="input" placeholder="Username"/>
               <Field name="password" component="input" type="password" placeholder="Password"/>
 
-              <button type="submit" disabled={pristine || invalid}>
+              <button type="submit" disabled={pristine || invalid || isLoading}>
                 Login
               </button>
             </form>
