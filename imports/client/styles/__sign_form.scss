@@ -7,7 +7,7 @@
 
   .sign-form {
     background-color: $light-blue;
-    padding: 70px 50px;
+    padding: 50px 40px;
     border-radius: 10px;
     display: flex;
     flex-wrap: wrap;
@@ -20,6 +20,7 @@
       border-color: transparent;
       border-radius: 5px;
       text-align: center;
+      width: 100px;
     }
 
     button {
@@ -29,6 +30,11 @@
       color: $neon-blue;
       border-radius: 5px;
       cursor: pointer;
+      margin-top: 30px;
+    }
+
+    .sign-form-header {
+      color: $night-blue;
     }
   }
 

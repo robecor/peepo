@@ -13,6 +13,10 @@ export default class Login extends Component {
         render={({handleSubmit, pristine, invalid}) => (
           <div className="sign-form-cont">
             <form onSubmit={handleSubmit} className="sign-form">
+              <div className="sign-form-header">
+                <h1>Login</h1>
+              </div>
+
               <Field name="userName" component="input" placeholder="Username"/>
               <Field name="password" component="input" type="password" placeholder="Password"/>
 
