@@ -1,7 +1,9 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {Route, Redirect} from "react-router-dom";
+import Navbar from '/imports/client/ui/utils/Navbar.jsx';
+import {createContainer} from 'meteor/react-meteor-data';
 
-export default class AuthRoute extends Component {
+class AuthRoute extends Component {
   shouldRedirect() {
     const {requireLogIn} = this.props;
 
@@ -9,19 +11,43 @@ export default class AuthRoute extends Component {
   }
 
   render() {
-    const {path, exact, component: Component} = this.props;
+    const {
+      path,
+      exact,
+      requireLogIn,
+      component: Component,
+      userId,
+      user
+    } = this.props;
 
     return (
       <Route
         path={path}
         exact={exact}
         render={(props) => (
-          this.shouldRedirect() ?
+          requireLogIn && !userId ?
             <Redirect to="/login"/>
             :
-            <Component {...props}/>
+            user ?
+              <Fragment>
+                <Navbar user={user}/>
+                <Component user={user} {...props}/>
+              </Fragment>
+              :
+              <div>Loading...</div>
         )}
       />
     );
   }
 }
+
+export default createContainer((props) => {
+  const userId = Meteor.userId();
+  const user = Meteor.user();
+
+  return {
+    userId,
+    user,
+    ...props
+  }
+}, AuthRoute);

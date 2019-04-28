@@ -1,0 +1,69 @@
+.navbar-cont {
+  position: fixed;
+  width: 100%;
+  height: 50px;
+  background-color: $light-blue;
+  display: flex;
+
+  .navbar {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: flex-end;
+    overflow: visible;
+
+    .navbar-dropdown {
+      display: inline-block;
+      overflow: visible;
+      position: relative;
+      margin-right: 50px;
+
+      .navbar-name {
+        font-size: 16px;
+        border: none;
+        outline: none;
+        color: $night-blue;
+        padding: 14px 16px;
+        background-color: inherit;
+        cursor: pointer;
+      }
+
+      .navbar-drop-content {
+        position: absolute;
+        top: 50px;
+        right: 0;
+        background-color: $light-blue;
+        display: none;
+
+        .navbar-link {
+          width: 100%;
+          color: $night-blue;
+          padding: 10px 20px;
+
+          a {
+            text-decoration: none;
+          }
+        }
+      }
+
+      &:hover {
+        .navbar-drop-content {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .navbar-header {
+    padding-left: 50px;
+    padding-top: 10px;
+
+    a {
+      text-decoration: none;
+      color: $night-blue;
+    }
+
+    h2 {
+      margin: 0;
+    }
+  }
+}
