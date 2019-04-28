@@ -18,9 +18,9 @@ export default class Navbar extends Component {
               {user.username}
             </button>
             <div className="navbar-drop-content">
-              <div className="navbar-link">
-                <Link to="/settings">Settings</Link>
-              </div>
+              {/*<div className="navbar-link">*/}
+                {/*<Link to="/settings">Settings</Link>*/}
+              {/*</div>*/}
               <div className="navbar-link">
                 <Link to="/logout">Log out</Link>
               </div>
