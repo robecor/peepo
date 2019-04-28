@@ -8,6 +8,7 @@ export default class Login extends Component {
   };
 
   onSubmit = ({username, password}) => {
+    const {history} = this.props;
     this.setState({isLoading: true});
 
     Meteor.loginWithPassword(username, password, (err) => {
@@ -15,7 +16,7 @@ export default class Login extends Component {
       if (err) {
         console.log(err);
       } else {
-        alert('Login success');
+        history.push('/');
       }
     })
   };

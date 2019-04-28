@@ -1,13 +1,22 @@
 import Login from '/imports/client/ui/userPages/Login.jsx';
-import Register from '/imports/client/ui/userPages/Register';
+import Register from '/imports/client/ui/userPages/Register.jsx';
+import Dashboard from '/imports/client/ui/mainPages/Dashboard.jsx';
 
 export default [
   {
     path: '/login',
-    component: Login
+    component: Login,
+    requireLogIn: false,
   },
   {
     path: '/register',
-    component: Register
+    component: Register,
+    requireLogIn: false
+  },
+  {
+    path: '/',
+    component: Dashboard,
+    requireLogIn: true,
+    exact: true
   },
 ];
