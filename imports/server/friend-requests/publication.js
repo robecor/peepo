@@ -1,4 +1,4 @@
-import FriendRequests from './collection.js';
+import FriendRequests from '/imports/db/friend-requests/collection.js';
 
 Meteor.publish('friend-requests', function () {
   const userId = this.userId;
