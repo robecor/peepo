@@ -8,6 +8,13 @@ Meteor.publish('friend-requests', function () {
   }
 
   return FriendRequests.find({
-    to: userId
+    $or: [
+      {
+        to: userId
+      },
+      {
+        from: userId
+      }
+    ]
   });
 });

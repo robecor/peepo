@@ -8,9 +8,12 @@ Meteor.methods({
       throw new Meteor.Error('Must be logged in!');
     }
 
+    const user = Meteor.users.findOne({_id: userId});
+
     FriendRequests.insert({
       from: userId,
-      to: toUserId
+      to: toUserId,
+      username: user.username
     });
   },
 

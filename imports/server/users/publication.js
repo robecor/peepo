@@ -11,5 +11,9 @@ Meteor.publish('friends', function () {
     _id: {
       $in: user.friends || []
     }
+  }, {
+    fields: {
+      username: 1
+    }
   });
 });

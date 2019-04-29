@@ -9,6 +9,10 @@ export default new SimpleSchema({
     type: String,
     optional: false
   },
+  username: {
+    type: String,
+    optional: false
+  },
   createdOn: {
     type: Date,
     defaultValue: new Date()
