@@ -2,6 +2,9 @@ import React, {Component} from 'react';
 import routes from '/imports/client/setup/routing/routes.js';
 import {BrowserRouter} from "react-router-dom";
 import AuthRoute from '/imports/client/setup/routing/components/AuthRoute.jsx';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#main-app');
 
 export default class App extends Component {
   render() {
