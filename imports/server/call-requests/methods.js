@@ -11,8 +11,13 @@ Meteor.methods({
     const user = Meteor.users.findOne({_id: userId});
     const toUser = Meteor.users.findOne({username});
 
-    if (user.friends && user.friends.includes(toUser._id)) {
-      throw new Meteor.Error('Already calling.');
+    const existingRequest = CallRequests.findOne({
+      from: userId,
+      to: toUser._id,
+    });
+
+    if (existingRequest) {
+      throw new Meteor.Error('Already calling');
     }
 
     CallRequests.insert({

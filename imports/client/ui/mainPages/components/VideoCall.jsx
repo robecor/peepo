@@ -1,26 +1,71 @@
 import React, {Component} from 'react';
+import Peer from 'peerjs';
+import {createContainer} from 'meteor/react-meteor-data';
+import CallRequests from '/imports/db/call-requests/collection.js';
 
-export default class VideoCall extends Component {
+class VideoCall extends Component {
+  componentDidMount() {
+    this.peer = new Peer();
+
+    this.props.onPeerReady(this.peer);
+  }
+
+  acceptCall = () => {
+
+  };
+
+  closeCallRequest = () => {
+    const {request} = this.props;
+
+    Meteor.call('removeCallRequest', {requestId: request._id}, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  };
+
   render() {
+    const {request, user} = this.props;
+
     return (
       <div className="video-call-cont">
         <div className="video-call">
           <div className="video-cont">
-            <div className="call-request-cont">
-              <div className="call-request">
-                <div className="call-username">
-                  <span>Friend 1 is calling...</span>
+            {
+              request ?
+                <div className="call-request-cont">
+                  <div className="call-request">
+                    <div className="call-username">
+                      {
+                        request.from === user._id ?
+                          <span>Calling {request.toUsername}</span>
+                          :
+                          <span>{request.fromUsername} is calling...</span>
+                      }
+                    </div>
+                    {
+                      request.from !== user._id ?
+                        <div className="call-request-controls">
+                          <button>
+                            Accept
+                          </button>
+                          <button className="red-button" onClick={this.closeCallRequest}>
+                            Decline
+                          </button>
+                        </div>
+                        :
+                        <div className="call-request-controls">
+                          <button className="red-button" onClick={this.closeCallRequest}>
+                            Cancel
+                          </button>
+                        </div>
+                    }
+                  </div>
                 </div>
-                <div className="call-request-controls">
-                  <button>
-                    Accept
-                  </button>
-                  <button className="red-button">
-                    Decline
-                  </button>
-                </div>
-              </div>
-            </div>
+                :
+                null
+
+            }
           </div>
 
           <div className="video-controls">
@@ -33,3 +78,14 @@ export default class VideoCall extends Component {
     );
   }
 }
+
+export default createContainer((props) => {
+  Meteor.subscribe('call-requests');
+
+  const request = CallRequests.findOne();
+
+  return {
+    request,
+    ...props
+  }
+}, VideoCall);
