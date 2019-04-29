@@ -40,7 +40,7 @@ export default class FriendList extends Component {
                 <FriendListItem username="Friend 1"/>
               </li>
               <li>
-                <FriendListItem username="Friend 2"/>
+                <FriendListItem username="Friend 2"  isRequest={true} isWaiting={true}/>
               </li>
               <li>
                 <FriendListItem username="Friend 3" isRequest={true}/>

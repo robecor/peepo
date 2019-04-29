@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 export default class FriendListItem extends Component {
   render() {
-    const {username, isRequest} = this.props;
+    const {username, isRequest, isWaiting} = this.props;
 
     return (
       <div className="fiend-list-item">
@@ -11,6 +11,11 @@ export default class FriendListItem extends Component {
         </div>
         {
           isRequest ?
+            isWaiting ?
+              <div className="friend-items-waiting">
+                <span>Waiting for response</span>
+              </div>
+                :
             <div className="friend-items-controls">
               <button>
                 Accept
