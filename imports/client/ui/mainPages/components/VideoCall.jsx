@@ -4,14 +4,49 @@ import {createContainer} from 'meteor/react-meteor-data';
 import CallRequests from '/imports/db/call-requests/collection.js';
 
 class VideoCall extends Component {
+  constructor(props) {
+    super(props);
+
+    this.videoRef = React.createRef();
+  }
+
   componentDidMount() {
     this.peer = new Peer();
 
     this.props.onPeerReady(this.peer);
+
+    this.peer.on('call', (call) => {
+      navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+      }).then((stream) => {
+        call.answer(stream);
+        call.on('stream', (remoteStream) => {
+          this.videoRef.current.srcObject = remoteStream;
+          this.videoRef.current.play();
+        });
+      }).catch((err) => {
+        console.log(err);
+      });
+    });
   }
 
   acceptCall = () => {
+    const {request} = this.props;
 
+    navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true
+    }).then((stream) => {
+      const call = this.peer.call(request.peerId, stream);
+      call.on('stream', (remoteStream) => {
+        console.log(remoteStream)
+        this.videoRef.current.srcObject = remoteStream;
+        this.videoRef.current.play()
+      });
+    }).catch((err) => {
+      console.log(err);
+    });
   };
 
   closeCallRequest = () => {
@@ -31,6 +66,7 @@ class VideoCall extends Component {
       <div className="video-call-cont">
         <div className="video-call">
           <div className="video-cont">
+            <video ref={this.videoRef}/>
             {
               request ?
                 <div className="call-request-cont">
@@ -46,7 +82,7 @@ class VideoCall extends Component {
                     {
                       request.from !== user._id ?
                         <div className="call-request-controls">
-                          <button>
+                          <button onClick={this.acceptCall}>
                             Accept
                           </button>
                           <button className="red-button" onClick={this.closeCallRequest}>
