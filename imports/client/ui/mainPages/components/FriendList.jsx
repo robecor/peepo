@@ -20,9 +20,37 @@ class FriendList extends Component {
   };
 
   onAddFriendSubmit = ({username}) => {
-    console.log(username);
+    Meteor.call('sendFriendRequest', {username}, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
 
     this.closeAddFriendModal();
+  };
+
+  onRequestAccept = ({username}) => {
+    Meteor.call('acceptFriendRequest', {username}, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  };
+
+  onRequestDecline = ({username}) => {
+    Meteor.call('declineFriendRequest', {username}, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  };
+
+  onFriendRemove = ({username}) => {
+    Meteor.call('removeFriend', {username}, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
   };
 
   render() {
@@ -41,16 +69,27 @@ class FriendList extends Component {
             <ul>
               {
                 friends.map(friend => (
-                  <FriendListItem username={friend.username}/>
+                  <li>
+                    <FriendListItem
+                      key={friend.username}
+                      username={friend.username}
+                      onRemove={this.onFriendRemove}
+                    />
+                  </li>
                 ))
               }
               {
                 requests.map(request => (
-                  <FriendListItem
-                    username={request.username}
-                    isRequest={true}
-                    isWaiting={request.from === user._id}
-                  />
+                  <li>
+                    <FriendListItem
+                      key={request._id}
+                      username={request.from === user._id ? request.toUsername : request.fromUsername}
+                      isRequest={true}
+                      isWaiting={request.from === user._id}
+                      onAccept={this.onRequestAccept}
+                      onDecline={this.onRequestDecline}
+                    />
+                  </li>
                 ))
               }
             </ul>
@@ -81,7 +120,7 @@ export default createContainer((props) => {
   const user = props.user;
   const friends = Meteor.users.find({
     _id: {
-      $in: user.friends || []
+      $ne: user._id
     }
   }).fetch();
   const requests = FriendRequests.find({

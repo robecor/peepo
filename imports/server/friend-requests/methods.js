@@ -11,10 +11,15 @@ Meteor.methods({
     const user = Meteor.users.findOne({_id: userId});
     const toUser = Meteor.users.findOne({username});
 
+    if (user.friends && user.friends.includes(toUser._id)) {
+      throw new Meteor.Error('Already friends.');
+    }
+
     FriendRequests.insert({
       from: userId,
       to: toUser._id,
-      username: user.username
+      fromUsername: user.username,
+      toUsername: toUser.username
     });
   },
 
@@ -69,4 +74,26 @@ Meteor.methods({
 
     FriendRequests.remove({_id: request._id});
   },
+
+  removeFriend({username}) {
+    const userId = this.userId;
+
+    if (!userId) {
+      throw new Meteor.Error('Must be logged in!');
+    }
+
+    const toUser = Meteor.users.findOne({username});
+
+    Meteor.users.update({_id: userId}, {
+      $pull: {
+        friends: toUser._id
+      }
+    });
+
+    Meteor.users.update({_id: toUser._id}, {
+      $pull: {
+        friends: userId
+      }
+    });
+  }
 });

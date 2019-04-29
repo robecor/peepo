@@ -9,7 +9,11 @@ export default new SimpleSchema({
     type: String,
     optional: false
   },
-  username: {
+  toUsername: {
+    type: String,
+    optional: false
+  },
+  fromUsername: {
     type: String,
     optional: false
   },

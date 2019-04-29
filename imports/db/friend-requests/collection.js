@@ -1,6 +1,6 @@
 import FriendRequestsSchema from './schema';
 
-const FriendRequests = new Mongo.Collection('friend-requests');
+const FriendRequests = new Mongo.Collection('friendRequests');
 
 FriendRequests.attachSchema(FriendRequestsSchema);
 

@@ -5,12 +5,8 @@ Meteor.publish('friends', function () {
     throw new Meteor.Error('Must be logged in.');
   }
 
-  const user = Meteor.users.findOne({_id: userId});
-
   return Meteor.users.find({
-    _id: {
-      $in: user.friends || []
-    }
+    friends: userId
   }, {
     fields: {
       username: 1
