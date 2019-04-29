@@ -2,6 +2,7 @@ import React, {Component, Fragment} from 'react';
 import {Route, Redirect} from "react-router-dom";
 import Navbar from '/imports/client/ui/utils/Navbar.jsx';
 import {createContainer} from 'meteor/react-meteor-data';
+import Loader from '/imports/client/ui/utils/Loader.jsx';
 
 class AuthRoute extends Component {
   shouldRedirect() {
@@ -34,7 +35,7 @@ class AuthRoute extends Component {
                 <Component user={user} {...props}/>
               </Fragment>
               :
-              <div>Loading...</div>
+              <Loader/>
         )}
       />
     );
