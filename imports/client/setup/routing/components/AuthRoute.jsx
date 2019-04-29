@@ -29,7 +29,7 @@ class AuthRoute extends Component {
           requireLogIn && !userId ?
             <Redirect to="/login"/>
             :
-            user && !requireLogIn  ?
+            user || !requireLogIn  ?
               <Fragment>
                 {requireLogIn && <Navbar user={user}/>}
                 <Component user={user} {...props}/>
