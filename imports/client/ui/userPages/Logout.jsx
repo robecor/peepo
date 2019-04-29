@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { Redirect } from 'react-router';
+import Loader from '/imports/client/ui/utils/Loader.jsx';
 
 export default class Logout extends Component {
   state = {
@@ -16,7 +17,7 @@ export default class Logout extends Component {
     const {isLoading} = this.state;
 
     if (isLoading) {
-      return <div>Loading ...</div>
+      return <Loader/>;
     }
 
     return <Redirect to="/login"/>
