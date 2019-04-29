@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import FriendListItem from './FriendListItem.jsx';
 
 export default class FriendList extends Component {
   render() {
@@ -13,49 +14,13 @@ export default class FriendList extends Component {
           <div className="friend-list-items">
             <ul>
               <li>
-                <div className="fiend-list-item">
-                  <div className="friend-item-username">
-                    <span>Friend 1</span>
-                  </div>
-                  <div className="friend-items-controls">
-                    <button>
-                      Call
-                    </button>
-                    <button className="red-button">
-                      Remove
-                    </button>
-                  </div>
-                </div>
+                <FriendListItem username="Friend 1"/>
               </li>
               <li>
-                <div className="fiend-list-item">
-                  <div className="friend-item-username">
-                    <span>Friend 2</span>
-                  </div>
-                  <div className="friend-items-controls">
-                    <button>
-                      Call
-                    </button>
-                    <button className="red-button">
-                      Remove
-                    </button>
-                  </div>
-                </div>
+                <FriendListItem username="Friend 2"/>
               </li>
               <li>
-                <div className="fiend-list-item">
-                  <div className="friend-item-username">
-                    <span>Friend 3</span>
-                  </div>
-                  <div className="friend-items-controls">
-                    <button>
-                      Call
-                    </button>
-                    <button className="red-button">
-                      Remove
-                    </button>
-                  </div>
-                </div>
+                <FriendListItem username="Friend 3" isRequest={true}/>
               </li>
             </ul>
           </div>
