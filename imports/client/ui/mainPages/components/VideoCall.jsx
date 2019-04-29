@@ -16,15 +16,17 @@ class VideoCall extends Component {
     this.props.onPeerReady(this.peer);
 
     this.peer.on('call', (call) => {
+      this.currentCall = call;
+
       navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true
       }).then((stream) => {
+        this.localStream = stream;
+
         call.answer(stream);
-        call.on('stream', (remoteStream) => {
-          this.videoRef.current.srcObject = remoteStream;
-          this.videoRef.current.play();
-        });
+        call.on('stream', this.onCallStream);
+        call.on('close', this.onCallClose);
       }).catch((err) => {
         console.log(err);
       });
@@ -34,19 +36,35 @@ class VideoCall extends Component {
   acceptCall = () => {
     const {request} = this.props;
 
+    this.closeCallRequest();
+
     navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true
     }).then((stream) => {
+      this.localStream = stream;
       const call = this.peer.call(request.peerId, stream);
-      call.on('stream', (remoteStream) => {
-        console.log(remoteStream)
-        this.videoRef.current.srcObject = remoteStream;
-        this.videoRef.current.play()
-      });
+      this.currentCall = call;
+
+      call.on('stream', this.onCallStream);
+      call.on('close', this.onCallClose);
     }).catch((err) => {
       console.log(err);
     });
+  };
+
+  onCallStream = (remoteStream) => {
+    this.videoRef.current.srcObject = remoteStream;
+    this.videoRef.current.play();
+  };
+
+  onCallClose = () => {
+    this.localStream.getTracks().forEach(track => {
+      track.stop();
+    });
+
+    this.localStream = null;
+    this.videoRef.current.srcObject = null;
   };
 
   closeCallRequest = () => {
@@ -57,6 +75,11 @@ class VideoCall extends Component {
         console.log(err);
       }
     });
+  };
+
+  endCall = () => {
+    this.currentCall.close();
+    this.onCallClose();
   };
 
   render() {
@@ -105,7 +128,7 @@ class VideoCall extends Component {
           </div>
 
           <div className="video-controls">
-            <button className="red-button">
+            <button className="red-button" onClick={this.endCall}>
               End
             </button>
           </div>

@@ -13,6 +13,10 @@
     .video-cont {
       height: 80%;
       background-color: $night-blue;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       video {
         width: 100%;
@@ -32,6 +36,9 @@
         height: 100%;
         align-items: center;
         padding: 0 40px;
+        position: absolute;
+        top: 0;
+        left: 0;
 
         .call-request {
           flex: 0 0 100%;
