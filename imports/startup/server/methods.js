@@ -1,0 +1,1 @@
+import '/imports/server/friend-requests/methods.js';
