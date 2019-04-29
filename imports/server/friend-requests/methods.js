@@ -1,7 +1,7 @@
 import FriendRequests from '/imports/db/friend-requests/collection.js';
 
 Meteor.methods({
-  sendFriendRequest({toUserId}) {
+  sendFriendRequest({username}) {
     const userId = this.userId;
 
     if (!userId) {
@@ -9,23 +9,25 @@ Meteor.methods({
     }
 
     const user = Meteor.users.findOne({_id: userId});
+    const toUser = Meteor.users.findOne({username});
 
     FriendRequests.insert({
       from: userId,
-      to: toUserId,
+      to: toUser._id,
       username: user.username
     });
   },
 
-  acceptFriendRequest({toUserId}) {
+  acceptFriendRequest({username}) {
     const userId = this.userId;
 
     if (!userId) {
       throw new Meteor.Error('Must be logged in!');
     }
 
+    const toUser = Meteor.users.findOne({username});
     const request = FriendRequests.findOne({
-      from: toUserId,
+      from: toUser._id,
       to: userId
     });
 
@@ -35,11 +37,11 @@ Meteor.methods({
 
     Meteor.users.update({_id: userId}, {
       $addToSet: {
-        friends: toUserId
+        friends: toUser._id
       }
     });
 
-    Meteor.users.update({_id: toUserId}, {
+    Meteor.users.update({_id: toUser._id}, {
       $addToSet: {
         friends: userId
       }
@@ -48,15 +50,16 @@ Meteor.methods({
     FriendRequests.remove({_id: request._id});
   },
 
-  declineFriendRequest({toUserId}) {
+  declineFriendRequest({username}) {
     const userId = this.userId;
 
     if (!userId) {
       throw new Meteor.Error('Must be logged in!');
     }
 
+    const toUser = Meteor.users.findOne({username});
     const request = FriendRequests.findOne({
-      from: toUserId,
+      from: toUser._id,
       to: userId
     });
 

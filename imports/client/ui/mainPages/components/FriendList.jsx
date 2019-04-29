@@ -2,8 +2,10 @@ import React, {Component} from 'react';
 import FriendListItem from './FriendListItem.jsx';
 import Modal from 'react-modal';
 import AddFriend from './AddFriend.jsx';
+import {createContainer} from 'meteor/react-meteor-data';
+import FriendRequests from '/imports/db/friend-requests/collection.js';
 
-export default class FriendList extends Component {
+class FriendList extends Component {
   state = {
     addFriendModalOpen: false,
     disableAddFriend: false
@@ -25,6 +27,7 @@ export default class FriendList extends Component {
 
   render() {
     const {addFriendModalOpen, disableAddFriend} = this.state;
+    const {friends, requests, user} = this.props;
 
     return (
       <div className="friend-list-cont">
@@ -36,15 +39,20 @@ export default class FriendList extends Component {
           </div>
           <div className="friend-list-items">
             <ul>
-              <li>
-                <FriendListItem username="Friend 1"/>
-              </li>
-              <li>
-                <FriendListItem username="Friend 2"  isRequest={true} isWaiting={true}/>
-              </li>
-              <li>
-                <FriendListItem username="Friend 3" isRequest={true}/>
-              </li>
+              {
+                friends.map(friend => (
+                  <FriendListItem username={friend.username}/>
+                ))
+              }
+              {
+                requests.map(request => (
+                  <FriendListItem
+                    username={request.username}
+                    isRequest={true}
+                    isWaiting={request.from === user._id}
+                  />
+                ))
+              }
             </ul>
           </div>
         </div>
@@ -54,7 +62,6 @@ export default class FriendList extends Component {
           onRequestClose={this.closeAddFriendModal}
           contentLabel="Add friend"
           className="app-modal"
-          // overlayClassName="Overlay"
         >
           <AddFriend
             onAddFriendSubmit={this.onAddFriendSubmit}
@@ -66,3 +73,31 @@ export default class FriendList extends Component {
     );
   }
 }
+
+export default createContainer((props) => {
+  Meteor.subscribe('friend-requests');
+  Meteor.subscribe('friends');
+
+  const user = props.user;
+  const friends = Meteor.users.find({
+    _id: {
+      $in: user.friends || []
+    }
+  }).fetch();
+  const requests = FriendRequests.find({
+    $or: [
+      {
+        to: user._id
+      },
+      {
+        from: user._id
+      }
+    ]
+  }).fetch();
+
+  return {
+    friends,
+    requests,
+    ...props
+  }
+}, FriendList);
