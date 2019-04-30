@@ -38,10 +38,23 @@ class VideoCall extends Component {
         console.log(err);
       });
     });
+
+    this.peer.on('connection', (connection) => {
+      this.currentConnection = connection;
+
+      this.currentConnection.on('data', this.handleConnectionData);
+    })
   }
+
+  handleConnectionData = (data) => {
+    if (data === 'peepo__end_call') {
+      this.onCallClose();
+    }
+  };
 
   acceptCall = () => {
     const {request} = this.props;
+    const requestId = request.peerId;
 
     this.closeCallRequest();
 
@@ -53,11 +66,14 @@ class VideoCall extends Component {
 
       this.setState({videoIsLoading: true});
 
-      const call = this.peer.call(request.peerId, stream);
+      const call = this.peer.call(requestId, stream);
       this.currentCall = call;
 
       call.on('stream', this.onCallStream);
       call.on('close', this.onCallClose);
+
+      this.currentConnection = this.peer.connect(requestId);
+      this.currentConnection.on('data', this.handleConnectionData);
     }).catch((err) => {
       console.log(err);
     });
@@ -77,7 +93,17 @@ class VideoCall extends Component {
 
       this.localStream = null;
     }
+    if (this.currentCall) {
+      this.currentCall.close();
+    }
+    if (this.currentConnection) {
+      this.currentConnection.close();
+    }
+
     this.videoRef.current.srcObject = null;
+    this.videoRef.current.pause();
+    this.videoRef.current.removeAttribute('src');
+    this.videoRef.current.load();
   };
 
   closeCallRequest = () => {
@@ -91,8 +117,11 @@ class VideoCall extends Component {
   };
 
   endCall = () => {
-    this.currentCall.close();
-    this.onCallClose();
+    this.currentConnection.send('peepo__end_call');
+
+    setTimeout(() => {
+      this.onCallClose();
+    }, 100);
   };
 
   render() {
