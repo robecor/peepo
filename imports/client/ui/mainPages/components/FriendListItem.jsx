@@ -25,6 +25,14 @@ export default class FriendListItem extends Component {
     }
   };
 
+  onCall = () => {
+    const {username} = this.props;
+
+    if (this.props.onCall) {
+      this.props.onCall({username});
+    }
+  };
+
   render() {
     const {username, isRequest, isWaiting} = this.props;
 
@@ -51,7 +59,7 @@ export default class FriendListItem extends Component {
             :
 
             <div className="friend-items-controls">
-              <button>
+              <button onClick={this.onCall}>
                 Call
               </button>
               <button className="red-button" onClick={this.onRemove}>

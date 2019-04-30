@@ -53,6 +53,12 @@ class FriendList extends Component {
     });
   };
 
+  onFriendCall = ({username}) => {
+    if (this.props.onFriendCall) {
+      this.props.onFriendCall({username});
+    }
+  };
+
   render() {
     const {addFriendModalOpen, disableAddFriend} = this.state;
     const {friends, requests, user} = this.props;
@@ -69,20 +75,19 @@ class FriendList extends Component {
             <ul>
               {
                 friends.map(friend => (
-                  <li>
+                  <li key={friend.username}>
                     <FriendListItem
-                      key={friend.username}
                       username={friend.username}
                       onRemove={this.onFriendRemove}
+                      onCall={this.onFriendCall}
                     />
                   </li>
                 ))
               }
               {
                 requests.map(request => (
-                  <li>
+                  <li key={request._id}>
                     <FriendListItem
-                      key={request._id}
                       username={request.from === user._id ? request.toUsername : request.fromUsername}
                       isRequest={true}
                       isWaiting={request.from === user._id}
