@@ -2,8 +2,13 @@ import React, {Component} from 'react';
 import Peer from 'peerjs';
 import {createContainer} from 'meteor/react-meteor-data';
 import CallRequests from '/imports/db/call-requests/collection.js';
+import Loader from '/imports/client/ui/utils/Loader.jsx';
 
 class VideoCall extends Component {
+  state = {
+    videoIsLoading: false
+  };
+
   constructor(props) {
     super(props);
 
@@ -24,6 +29,8 @@ class VideoCall extends Component {
       }).then((stream) => {
         this.localStream = stream;
 
+        this.setState({videoIsLoading: true});
+
         call.answer(stream);
         call.on('stream', this.onCallStream);
         call.on('close', this.onCallClose);
@@ -43,6 +50,9 @@ class VideoCall extends Component {
       video: true
     }).then((stream) => {
       this.localStream = stream;
+
+      this.setState({videoIsLoading: true});
+
       const call = this.peer.call(request.peerId, stream);
       this.currentCall = call;
 
@@ -56,14 +66,17 @@ class VideoCall extends Component {
   onCallStream = (remoteStream) => {
     this.videoRef.current.srcObject = remoteStream;
     this.videoRef.current.play();
+    this.setState({videoIsLoading: false});
   };
 
   onCallClose = () => {
-    this.localStream.getTracks().forEach(track => {
-      track.stop();
-    });
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => {
+        track.stop();
+      });
 
-    this.localStream = null;
+      this.localStream = null;
+    }
     this.videoRef.current.srcObject = null;
   };
 
@@ -83,12 +96,14 @@ class VideoCall extends Component {
   };
 
   render() {
+    const {videoIsLoading} = this.state;
     const {request, user} = this.props;
 
     return (
       <div className="video-call-cont">
         <div className="video-call">
           <div className="video-cont">
+            {videoIsLoading && <Loader/>}
             <video ref={this.videoRef}/>
             {
               request ?
