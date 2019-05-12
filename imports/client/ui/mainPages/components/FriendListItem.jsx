@@ -33,6 +33,12 @@ export default class FriendListItem extends Component {
     }
   };
 
+  showCallButton() {
+    const {isOnline, isInCall} = this.props;
+
+    return isOnline && !isInCall;
+  }
+
   render() {
     const {username, isRequest, isWaiting, isOnline} = this.props;
 
@@ -61,7 +67,7 @@ export default class FriendListItem extends Component {
 
             <div className="friend-items-controls">
               {
-                isOnline &&
+                this.showCallButton() &&
                 <button onClick={this.onCall}>
                   Call
                 </button>

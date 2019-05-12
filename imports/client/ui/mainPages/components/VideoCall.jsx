@@ -34,6 +34,8 @@ class VideoCall extends Component {
         call.answer(stream);
         call.on('stream', this.onCallStream);
         call.on('close', this.onCallClose);
+
+        Session.set('is_in_call', true);
       }).catch((err) => {
         console.log(err);
       });
@@ -71,6 +73,7 @@ class VideoCall extends Component {
 
       call.on('stream', this.onCallStream);
       call.on('close', this.onCallClose);
+      Session.set('is_in_call', true);
 
       this.currentConnection = this.peer.connect(requestId);
       this.currentConnection.on('data', this.handleConnectionData);
@@ -104,6 +107,7 @@ class VideoCall extends Component {
     this.videoRef.current.pause();
     this.videoRef.current.removeAttribute('src');
     this.videoRef.current.load();
+    Session.set('is_in_call', false);
   };
 
   closeCallRequest = () => {
