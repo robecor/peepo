@@ -61,7 +61,7 @@ class FriendList extends Component {
 
   render() {
     const {addFriendModalOpen, disableAddFriend} = this.state;
-    const {friends, requests, user} = this.props;
+    const {friends, requests, user, isInCall} = this.props;
 
     return (
       <div className="friend-list-cont">
@@ -80,6 +80,8 @@ class FriendList extends Component {
                       username={friend.username}
                       onRemove={this.onFriendRemove}
                       onCall={this.onFriendCall}
+                      isOnline={friend.status.online}
+                      isInCall={isInCall}
                     />
                   </li>
                 ))
@@ -138,10 +140,12 @@ export default createContainer((props) => {
       }
     ]
   }).fetch();
+  const isInCall = Session.get('is_in_call');
 
   return {
     friends,
     requests,
+    isInCall,
     ...props
   }
 }, FriendList);

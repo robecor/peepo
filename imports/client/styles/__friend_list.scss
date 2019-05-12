@@ -38,6 +38,23 @@
               font-size: 20px;
               font-family: sans-serif;
               margin-top: 10px;
+
+              .online-status {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: inline-block;
+                margin-left: 20px;
+                margin-bottom: -3px;
+
+                &.online {
+                  background-color: $dark-green;
+                }
+
+                &.offline {
+                  background-color: $dark-red;
+                }
+              }
             }
 
             .friend-items-controls {

@@ -23,3 +23,5 @@ accounts-password
 accounts-base
 react-meteor-data
 aldeed:collection2
+mizzao:user-status
+session
