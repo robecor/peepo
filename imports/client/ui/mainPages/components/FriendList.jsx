@@ -80,6 +80,7 @@ class FriendList extends Component {
                       username={friend.username}
                       onRemove={this.onFriendRemove}
                       onCall={this.onFriendCall}
+                      isOnline={friend.status.online}
                     />
                   </li>
                 ))

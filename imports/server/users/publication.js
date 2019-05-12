@@ -9,7 +9,8 @@ Meteor.publish('friends', function () {
     friends: userId
   }, {
     fields: {
-      username: 1
+      username: 1,
+      status: 1
     }
   });
 });

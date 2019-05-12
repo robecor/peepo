@@ -34,12 +34,13 @@ export default class FriendListItem extends Component {
   };
 
   render() {
-    const {username, isRequest, isWaiting} = this.props;
+    const {username, isRequest, isWaiting, isOnline} = this.props;
 
     return (
       <div className="fiend-list-item">
         <div className="friend-item-username">
           <span>{username}</span>
+          <div className={`online-status ${isOnline ? 'online' : 'offline'}`}/>
         </div>
         {
           isRequest ?
@@ -59,9 +60,12 @@ export default class FriendListItem extends Component {
             :
 
             <div className="friend-items-controls">
-              <button onClick={this.onCall}>
-                Call
-              </button>
+              {
+                isOnline &&
+                <button onClick={this.onCall}>
+                  Call
+                </button>
+              }
               <button className="red-button" onClick={this.onRemove}>
                 Remove
               </button>
