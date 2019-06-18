@@ -6,7 +6,8 @@ import Loader from '/imports/client/ui/utils/Loader.jsx';
 
 class VideoCall extends Component {
   state = {
-    videoIsLoading: false
+    videoIsLoading: false,
+    isInCall: false
   };
 
   constructor(props) {
@@ -36,6 +37,7 @@ class VideoCall extends Component {
         call.on('close', this.onCallClose);
 
         Session.set('is_in_call', true);
+        this.setState({isInCall: true});
       }).catch((err) => {
         console.log(err);
       });
@@ -74,6 +76,7 @@ class VideoCall extends Component {
       call.on('stream', this.onCallStream);
       call.on('close', this.onCallClose);
       Session.set('is_in_call', true);
+      this.setState({isInCall: true});
 
       this.currentConnection = this.peer.connect(requestId);
       this.currentConnection.on('data', this.handleConnectionData);
@@ -108,6 +111,7 @@ class VideoCall extends Component {
     this.videoRef.current.removeAttribute('src');
     this.videoRef.current.load();
     Session.set('is_in_call', false);
+    this.setState({isInCall: false});
   };
 
   closeCallRequest = () => {
@@ -129,7 +133,7 @@ class VideoCall extends Component {
   };
 
   render() {
-    const {videoIsLoading} = this.state;
+    const {videoIsLoading, isInCall} = this.state;
     const {request, user} = this.props;
 
     return (
@@ -175,11 +179,15 @@ class VideoCall extends Component {
             }
           </div>
 
-          <div className="video-controls">
-            <button className="red-button" onClick={this.endCall}>
-              End
-            </button>
-          </div>
+          {
+            isInCall &&
+            <div className="video-controls">
+              <button className="red-button" onClick={this.endCall}>
+                End
+              </button>
+            </div>
+          }
+
         </div>
       </div>
     );
