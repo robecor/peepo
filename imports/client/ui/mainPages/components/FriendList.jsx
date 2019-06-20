@@ -59,6 +59,12 @@ class FriendList extends Component {
     }
   };
 
+  onCreateRoom = () => {
+    if (this.props.onCreateRoom) {
+      this.props.onCreateRoom();
+    }
+  };
+
   render() {
     const {addFriendModalOpen, disableAddFriend} = this.state;
     const {friends, requests, user, isInCall} = this.props;
@@ -67,6 +73,9 @@ class FriendList extends Component {
       <div className="friend-list-cont">
         <div className="friend-list">
           <div className="friend-list-controls">
+            <button onClick={this.onCreateRoom}>
+              Create room
+            </button>
             <button onClick={this.openAddFriendModal}>
               Add friend
             </button>

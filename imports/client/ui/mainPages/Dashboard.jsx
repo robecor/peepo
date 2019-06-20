@@ -11,6 +11,18 @@ export default class Dashboard extends Component {
     })
   };
 
+  onCreateRoom = () => {
+    const {history} = this.props;
+
+    Meteor.call('createRoom', (err, roomId) => {
+      if (err) {
+        console.log(err);
+      } else {
+        history.push(`/room/${roomId}`);
+      }
+    })
+  };
+
   onPeerReady = (peer) => {
     this.peer = peer;
   };
@@ -21,7 +33,7 @@ export default class Dashboard extends Component {
     return (
       <div className="dashboard-cont">
         <div className="dashboard">
-          <FriendList user={user} onFriendCall={this.onFriendCall}/>
+          <FriendList user={user} onFriendCall={this.onFriendCall} onCreateRoom={this.onCreateRoom}/>
           <VideoCall user={user} onPeerReady={this.onPeerReady}/>
         </div>
       </div>
