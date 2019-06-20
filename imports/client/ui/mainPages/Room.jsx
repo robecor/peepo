@@ -27,10 +27,11 @@ class Room extends Component {
         this.peer.on('call', (call) => {
           const peerId = call.peer;
           const userId = call.metadata.userId;
+          const username = call.metadata.username;
 
           call.answer(stream);
           call.on('stream', (remoteStream) => {
-            this.addParticipant(userId, peerId, call, remoteStream);
+            this.addParticipant(userId, username, peerId, call, remoteStream);
           });
           call.on('close', () => {
             this.removeParticipant(userId);
@@ -50,13 +51,14 @@ class Room extends Component {
 
             const call = this.peer.call(participant.peerId, stream, {
               metadata: {
-                userId: user._id
+                userId: user._id,
+                username: user.username
               }
             });
 
             call.on('stream', (remoteStream) => {
               this.callingList = this.callingList.filter(item => item !== peerId);
-              this.addParticipant(participant.userId, participant.peerId, call, remoteStream);
+              this.addParticipant(participant.userId, participant.username, participant.peerId, call, remoteStream);
             });
             call.on('close', () => {
               this.removeParticipant(participant.userId);
@@ -75,7 +77,15 @@ class Room extends Component {
     });
   }
 
-  addParticipant(userId, peerId, call, stream) {
+  componentWillUnmount() {
+    const {match} = this.props;
+    const roomId = match.params.roomId;
+    const peerId = this.peer.id;
+
+    Meteor.call('leaveRoom', {roomId, peerId});
+  }
+
+  addParticipant(userId, username, peerId, call, stream) {
     this.setState((state, props) => {
       const {callList} = state;
 
@@ -83,6 +93,8 @@ class Room extends Component {
 
       filteredList.push({
         userId,
+        username,
+        peerId,
         call,
         stream
       });
@@ -107,16 +119,16 @@ class Room extends Component {
     return (
       <div>
         <div className="dashboard-cont">
-        <div className="dashboard">
-          {
-            callList.map(callItem => {
-              return (
-                <RoomVideo key={callItem.peerId} stream={callItem.stream}/>
-              );
-            })
-          }
+          <div className="dashboard">
+            {
+              callList.map(callItem => {
+                return (
+                  <RoomVideo key={callItem.peerId} username={callItem.username} stream={callItem.stream}/>
+                );
+              })
+            }
+          </div>
         </div>
-      </div>
       </div>
     );
   }

@@ -9,6 +9,7 @@ Meteor.methods({
 
   joinRoom({roomId, peerId}) {
     const room = Rooms.findOne(roomId);
+    const user = Meteor.users.findOne(this.userId);
 
     if (!room) {
       throw new Meteor.Error('No room found!');
@@ -30,7 +31,8 @@ Meteor.methods({
       $push: {
         participants: {
           userId: this.userId,
-          peerId: peerId
+          peerId: peerId,
+          username: user.username
         }
       }
     });

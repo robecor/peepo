@@ -8,6 +8,10 @@ export default new SimpleSchema({
   },
   'participants.$': {
     type: new SimpleSchema({
+      username: {
+        type: String,
+        optional: false
+      },
       userId: {
         type: String,
         optional: false
