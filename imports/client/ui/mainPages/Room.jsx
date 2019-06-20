@@ -5,7 +5,8 @@ import RoomVideo from './components/RoomVideo.jsx';
 
 class Room extends Component {
   state = {
-    callList: []
+    callList: [],
+    mainCallPeerId: null
   };
 
   componentDidMount() {
@@ -13,7 +14,6 @@ class Room extends Component {
     this.peer = new Peer();
 
     this.peer.on('open', () => {
-
       const peerId = this.peer.id;
       const {match, user} = this.props;
       const roomId = match.params.roomId;
@@ -82,12 +82,21 @@ class Room extends Component {
     const roomId = match.params.roomId;
     const peerId = this.peer.id;
 
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => {
+        track.stop();
+      });
+
+      this.localStream = null;
+    }
+
     Meteor.call('leaveRoom', {roomId, peerId});
   }
 
   addParticipant(userId, username, peerId, call, stream) {
     this.setState((state, props) => {
       const {callList} = state;
+      const returnObject = {};
 
       const filteredList = callList.filter(call => call.userId !== userId);
 
@@ -99,34 +108,78 @@ class Room extends Component {
         stream
       });
 
-      return {callList: filteredList};
+      returnObject.callList = filteredList;
+
+      if (filteredList.length === 1) {
+        returnObject.mainCallPeerId = peerId;
+      }
+
+      return returnObject;
     });
   }
 
   removeParticipant(userId) {
     this.setState((state, props) => {
-      const {callList} = state;
+      const {callList, mainCallPeerId} = state;
+      const returnObject = {};
 
+      const toRemoveCall = callList.find(call => call.userId !== userId);
       const newCallList = callList.filter(call => call.userId !== userId);
 
-      return {callList: newCallList};
+      returnObject.callList = newCallList;
+
+      if (toRemoveCall.peerId === mainCallPeerId) {
+        returnObject.mainCallPeerId = newCallList[0] ? newCallList[0].peerId : null;
+      }
+
+      return returnObject;
     });
   }
 
+  leaveRoom = () => {
+    const {history} = this.props;
+    history.push('/');
+  };
+
+  onVideoClick = (peerId) => {
+    this.setState({mainCallPeerId: peerId});
+  };
+
   render() {
-    const {callList} = this.state;
+    const {callList, mainCallPeerId} = this.state;
+    const mainCall = callList.find(callItem => callItem.peerId === mainCallPeerId);
+    const filteredList = callList.filter(callItem => callItem.peerId !== mainCallPeerId);
 
     return (
-      <div>
-        <div className="dashboard-cont">
-          <div className="dashboard">
-            {
-              callList.map(callItem => {
-                return (
-                  <RoomVideo key={callItem.peerId} username={callItem.username} stream={callItem.stream}/>
-                );
-              })
-            }
+      <div className="dashboard-cont">
+        <div className="dashboard">
+          <div className="video-room-cont">
+            <div className="video-list">
+              {
+                filteredList.map(callItem => {
+                  return (
+                    <RoomVideo key={callItem.peerId}
+                               username={callItem.username}
+                               stream={callItem.stream}
+                               peerId={callItem.peerId}
+                               onVideoClick={this.onVideoClick}/>
+                  );
+                })
+              }
+            </div>
+            <div className="room-main-video">
+              {
+                mainCall ?
+                  <RoomVideo username={mainCall.username} stream={mainCall.stream}/>
+                  :
+                  ''
+              }
+              <div className="room-main-controls">
+                <button className="red-button" onClick={this.leaveRoom}>
+                  Leave room
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

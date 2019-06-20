@@ -14,10 +14,25 @@ export default class RoomVideo extends Component {
     this.videoRef.current.play();
   }
 
+  onClickVideo = () => {
+    const {peerId, onVideoClick} = this.props;
+
+    if (onVideoClick) {
+      onVideoClick(peerId);
+    }
+  };
+
   render() {
+    const {username} = this.props;
+
     return (
-      <div>
-        <video ref={this.videoRef}/>
+      <div className="video-item" onClick={this.onClickVideo}>
+        <div className="video-item-box">
+          <video ref={this.videoRef}/>
+        </div>
+        <div className="video-item-username">
+          <span>{username}</span>
+        </div>
       </div>
     );
   }

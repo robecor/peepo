@@ -11,6 +11,10 @@
       border-bottom: 2px solid $night-blue;
       padding: 10px 20px;
       text-align: right;
+
+      button {
+        margin-left: 20px;
+      }
     }
 
     .friend-list-items {
