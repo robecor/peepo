@@ -14,6 +14,13 @@ export default class RoomVideo extends Component {
     this.videoRef.current.play();
   }
 
+  componentDidUpdate() {
+    const {stream} = this.props;
+
+    this.videoRef.current.srcObject = stream;
+    this.videoRef.current.play();
+  }
+
   onClickVideo = () => {
     const {peerId, onVideoClick} = this.props;
 

@@ -13,6 +13,17 @@ class Room extends Component {
     this.callingList = [];
     this.peer = new Peer();
 
+    this.peer.on('connection', (connection) => {
+      const {userId} = connection.metadata;
+      const peerId = connection.peer;
+
+      this.addConnectionToParticipant(userId, connection);
+
+      connection.on('data', (data) => {
+        this.onConnectionData(data, peerId);
+      });
+    });
+
     this.peer.on('open', () => {
       const peerId = this.peer.id;
       const {match, user} = this.props;
@@ -31,25 +42,25 @@ class Room extends Component {
 
           call.answer(stream);
           call.on('stream', (remoteStream) => {
-            this.addParticipant(userId, username, peerId, call, remoteStream);
+            this.addParticipant(userId, username, peerId, call, null, remoteStream);
           });
           call.on('close', () => {
-            this.removeParticipant(userId);
+            this.removeParticipant(peerId);
           });
         });
 
         Meteor.call('getRoomParticipants', {roomId}, (err, participants) => {
           participants.forEach(participant => {
-            const {userId, peerId} = participant;
+            const {userId, peerId: participantPeerId} = participant;
 
             if (userId === user._id || this.callingList.includes(peerId)) {
               return;
             }
 
             // Flag the fact that we are calling this peer already
-            this.callingList.push(peerId);
+            this.callingList.push(participantPeerId);
 
-            const call = this.peer.call(participant.peerId, stream, {
+            const call = this.peer.call(participantPeerId, stream, {
               metadata: {
                 userId: user._id,
                 username: user.username
@@ -57,11 +68,22 @@ class Room extends Component {
             });
 
             call.on('stream', (remoteStream) => {
-              this.callingList = this.callingList.filter(item => item !== peerId);
-              this.addParticipant(participant.userId, participant.username, participant.peerId, call, remoteStream);
+              const connection = this.peer.connect(participantPeerId, {
+                metadata: {
+                  userId: user._id,
+                  username: user.username
+                }
+              });
+
+              connection.on('data', (data) => {
+                this.onConnectionData(data, participantPeerId);
+              });
+
+              this.callingList = this.callingList.filter(item => item !== participantPeerId);
+              this.addParticipant(participant.userId, participant.username, participantPeerId, call, connection, remoteStream);
             });
             call.on('close', () => {
-              this.removeParticipant(participant.userId);
+              this.removeParticipant(participantPeerId);
             });
           });
         });
@@ -78,6 +100,7 @@ class Room extends Component {
   }
 
   componentWillUnmount() {
+    const {callList} = this.state;
     const {match} = this.props;
     const roomId = match.params.roomId;
     const peerId = this.peer.id;
@@ -90,10 +113,16 @@ class Room extends Component {
       this.localStream = null;
     }
 
+    callList.forEach(call => {
+      if (call.connection) {
+        call.connection.send('peepo__end_call');
+      }
+    });
+
     Meteor.call('leaveRoom', {roomId, peerId});
   }
 
-  addParticipant(userId, username, peerId, call, stream) {
+  addParticipant(userId, username, peerId, call, connection, stream) {
     this.setState((state, props) => {
       const {callList} = state;
       const returnObject = {};
@@ -105,6 +134,7 @@ class Room extends Component {
         username,
         peerId,
         call,
+        connection,
         stream
       });
 
@@ -118,22 +148,53 @@ class Room extends Component {
     });
   }
 
-  removeParticipant(userId) {
+  removeParticipant(peerId) {
     this.setState((state, props) => {
       const {callList, mainCallPeerId} = state;
       const returnObject = {};
 
-      const toRemoveCall = callList.find(call => call.userId !== userId);
-      const newCallList = callList.filter(call => call.userId !== userId);
+      const toRemoveCall = callList.find(call => call.peerId === peerId);
+      const newCallList = callList.filter(call => call.peerId !== peerId);
+
+      if (!toRemoveCall) {
+        return {};
+      }
+
+      if (toRemoveCall.call) {
+        toRemoveCall.call.close();
+      }
+      if (toRemoveCall.connection) {
+        toRemoveCall.connection.close();
+      }
 
       returnObject.callList = newCallList;
 
-      if (toRemoveCall.peerId === mainCallPeerId) {
+      if (peerId === mainCallPeerId) {
         returnObject.mainCallPeerId = newCallList[0] ? newCallList[0].peerId : null;
       }
 
       return returnObject;
     });
+  }
+
+  addConnectionToParticipant(userId, connection) {
+    this.setState((state, props) => {
+      const {callList} = state;
+
+      callList.forEach(call => {
+        if (call.userId === userId) {
+          call.connection = connection;
+        }
+      });
+
+      return callList;
+    });
+  }
+
+  onConnectionData(data, peerId) {
+    if (data === 'peepo__end_call') {
+      this.removeParticipant(peerId);
+    }
   }
 
   leaveRoom = () => {
