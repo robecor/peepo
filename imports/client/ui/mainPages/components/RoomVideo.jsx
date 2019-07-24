@@ -9,6 +9,7 @@ export default class RoomVideo extends Component {
 
   componentDidMount() {
     const {stream} = this.props;
+    console.log(1);
 
     this.videoRef.current.srcObject = stream;
     this.videoRef.current.play();

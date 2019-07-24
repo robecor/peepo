@@ -33,6 +33,7 @@ class Room extends Component {
         audio: true,
         video: true
       }).then((stream) => {
+        
         this.localStream = stream;
 
         this.peer.on('call', (call) => {
