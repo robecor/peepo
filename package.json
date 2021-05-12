@@ -18,7 +18,7 @@
     "react-final-form": "^4.1.0",
     "react-modal": "^3.8.1",
     "react-router-dom": "^5.0.0",
-    "simpl-schema": "^1.5.5"
+    "simpl-schema": "^1.10.2"
   },
   "meteor": {
     "mainModule": {
